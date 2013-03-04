@@ -16,6 +16,7 @@ elgg_load_js('elgg.rss');
 // Get values/sticky values
 $title          = elgg_extract('title', $vars);
 $description	= elgg_extract('description', $vars);
+$feed_url       = elgg_extract('feed_url', $vars);
 $tags 			= elgg_extract('tags', $vars);
 $access_id 		= elgg_extract('access_id', $vars, ACCESS_DEFAULT);
 $container_guid = elgg_extract('container_guid', $vars);
@@ -37,6 +38,13 @@ $description_label = elgg_echo('description');
 $description_input = elgg_view('input/longtext', array(
 	'value' => $description,
 	'name' => 'description', 
+));
+
+$url_label = elgg_echo('rss:label:url');
+$url_input = elgg_view('input/url', array(
+	'value' => $feed_url,
+	'name' => 'feed_url',
+	'id' => 'rss-url',
 ));
 
 $tags_label =  elgg_echo('tags');
@@ -69,6 +77,10 @@ $content = <<<HTML
 		<div>
 			<label>$title_label</label>
 			$title_input
+		</div><br />
+		<div>
+			<label>$url_label</label>
+			$url_input
 		</div><br />
 		<div>
 			<label>$description_label</label>

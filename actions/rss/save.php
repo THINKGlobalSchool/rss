@@ -14,13 +14,14 @@
 $guid 				= get_input('guid');
 $title              = get_input('title');
 $description		= get_input('description');
+$feed_url           = get_input('feed_url');          
 $tags 				= string_to_tag_array(get_input('tags'));
 $access 			= get_input('access_id');
 $container_guid 	= get_input('container_guid', NULL);
 
 // Sticky form
 elgg_make_sticky_form('rss-save-form');
-if (!$title) {
+if (!$title || !$feed_url) {
 	register_error(elgg_echo('rss:error:requiredfields'));
 	forward(elgg_get_site_url() . 'rss/add');
 }
@@ -42,6 +43,7 @@ if ($guid) {
 
 $rss->title = $title;
 $rss->description = $description;
+$rss->feed_url = $feed_url;
 $rss->tags = $tags;
 $rss->access_id = $access;
 

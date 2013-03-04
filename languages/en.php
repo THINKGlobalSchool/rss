@@ -25,6 +25,7 @@ $english = array(
 	'rss:add' => 'Add RSS Feed',
 	'rss:label:noresults' => 'No Results',
 	'rss:label:groupfeeds' => 'Group RSS Feeds',
+	'rss:label:url' => 'Feed URL',
 
 	// Notifications
 	'rss:notification:subject' => 'New RSS Feed',
@@ -41,7 +42,7 @@ $english = array(
 	'rss:error:save' => 'Error saving RSS Feed',
 	'rss:error:delete' => 'There was an error deleting the RSS Feed',
 	'rss:error:requiredfields' => 'One or more required fields are missing',
-	'rss:error:invalidurl' => 'Invalid URL',
+	'rss:error:invalidurl' => 'Invalid Feed URL',
 	'rss:error:notfound' => 'RSS Feed Not Found',
 );
 

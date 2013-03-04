@@ -17,6 +17,9 @@ function rss_init() {
 	elgg_register_library('elgg:rss', elgg_get_plugins_path() . 'rss/lib/rss.php');
 	elgg_load_library('elgg:rss');
 
+	// Register simplepie library
+	elgg_register_library('elgg:simplepie', elgg_get_plugins_path() . 'rss/vendors/simplepie.inc');
+
 	// Page handler
 	elgg_register_page_handler('rss','rss_page_handler');
 
@@ -29,6 +32,13 @@ function rss_init() {
 	$r_js = elgg_get_simplecache_url('js', 'rss/rss');
 	elgg_register_simplecache_view('js/rss/rss');
 	elgg_register_js('elgg.rss', $r_js);
+
+	// Register JS library
+	$r_js = elgg_get_simplecache_url('js', 'rss/jquery_feeds');
+	elgg_register_simplecache_view('js/rss/jquery_feeds');
+	elgg_register_js('jquery.feeds', $r_js);
+
+	elgg_load_js('jquery.feeds');
 	
 	// Add to main menu
 	$item = new ElggMenuItem('rss', elgg_echo('rss'), 'rss');
@@ -42,6 +52,7 @@ function rss_init() {
 	$action_base = elgg_get_plugins_path() . 'rss/actions/rss';
 	elgg_register_action('rss/save', "$action_base/save.php");
 	elgg_register_action('rss/delete', "$action_base/delete.php");
+	elgg_register_action('rss/validate', "$action_base/validate.php");
 
 	// Entity url and icon handlers
 	elgg_register_entity_url_handler('object', 'rss_feed', 'rss_url_handler');

@@ -60,7 +60,11 @@ if ($full) {
 	$body = elgg_view('output/longtext', array(
 		'value' => $rss->description,
 	));
-	
+
+	$feed = elgg_view('rss/feed', array(
+		'url' => $rss->feed_url,
+	));	
+
 	$params = array(
 		'entity' => $rss,
 		'title' => false,
@@ -77,6 +81,8 @@ if ($full) {
 	echo <<<HTML
 	$rss_info
 	$body
+	<hr />
+	$feed
 HTML;
 
 } else {

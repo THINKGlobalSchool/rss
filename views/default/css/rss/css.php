@@ -10,3 +10,25 @@
  *
  */
 ?>
+
+.elgg-rss-feed {
+	
+}
+
+.elgg-rss-feed .elgg-rss-feed-entry {
+	border-bottom: 1px dotted #CCCCCC;
+	margin-bottom: 15px;
+	padding-bottom: 15px;
+}
+
+.elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-title {
+	
+}
+
+.elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-date {
+	
+}
+
+.elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-excerpt {
+	
+}
