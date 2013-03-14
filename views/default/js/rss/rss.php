@@ -15,15 +15,21 @@ elgg.provide('elgg.rss');
 
 // Init function
 elgg.rss.init = function() {
- 	$('.elgg-rss-feed').each(function() {
- 		elgg.rss.initFeed($(this));
- 	});
+	// Init feeds
+	elgg.rss.initFeeds();
 
  	// Delegate submit handler for rss feed form
  	$(document).delegate('#rss-save-form', 'submit', elgg.rss.saveFormSubmit);
 
  	// Delegate click handler for rss embed
  	$(document).delegate('.elgg-rss-embed-feed', 'click', elgg.rss.feedEmbedClick);
+}
+
+// Init all feeds
+elgg.rss.initFeeds = function() {
+	$('.elgg-rss-feed').each(function() {
+ 		elgg.rss.initFeed($(this));
+ 	});
 }
 
 elgg.rss.initFeed = function($feed) {
@@ -36,9 +42,12 @@ elgg.rss.initFeed = function($feed) {
 			'feeds': feeds, // Feeds object (can be multiple)
 			'entryTemplate': elgg.rss.getDefaultEntryTemplate(),
 			'loadingTemplate': '<div class="elgg-ajax-loader"></div>',
-			// 'preprocess': function(feed) {
-				
-			// }
+			'onComplete': function(entries) {
+				if (!entries.length) {
+					$(this).append("<h3 class='center'>" + elgg.echo('rss:label:noresults') + "</h3>");
+				}
+			}
+			// 'preprocess': function(feed) {}
 		});
 }
 
