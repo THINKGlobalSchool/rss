@@ -12,6 +12,7 @@
 
 $english = array(
 	// Generic
+	'item:object:rss_feed' => 'RSS Feeds',
 	'rss' => 'RSS Feeds',
 	'rss:enablegroup' => 'Enable group RSS feeds',
 
@@ -26,6 +27,7 @@ $english = array(
 	'rss:label:noresults' => 'No Results',
 	'rss:label:groupfeeds' => 'Group RSS Feeds',
 	'rss:label:url' => 'Feed URL',
+	'rss:label:embedfeed' => 'Embed Feed',
 
 	// Notifications
 	'rss:notification:subject' => 'New RSS Feed',

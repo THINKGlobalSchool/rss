@@ -27,13 +27,15 @@ function rss_init() {
 	$r_css = elgg_get_simplecache_url('css', 'rss/css');
 	elgg_register_simplecache_view('css/rss/css');
 	elgg_register_css('elgg.rss', $r_css);
+	elgg_load_css('elgg.rss');
 		
 	// Register JS library
 	$r_js = elgg_get_simplecache_url('js', 'rss/rss');
 	elgg_register_simplecache_view('js/rss/rss');
 	elgg_register_js('elgg.rss', $r_js);
+	elgg_load_js('elgg.rss');
 
-	// Register JS library
+	// Register jquery feeds JS library
 	$r_js = elgg_get_simplecache_url('js', 'rss/jquery_feeds');
 	elgg_register_simplecache_view('js/rss/jquery_feeds');
 	elgg_register_js('jquery.feeds', $r_js);
@@ -43,6 +45,11 @@ function rss_init() {
 	// Add to main menu
 	$item = new ElggMenuItem('rss', elgg_echo('rss'), 'rss');
 	elgg_register_menu_item('site', $item);
+
+	// Customize the rss feed embed entity menu
+	if (elgg_is_active_plugin('tgsembed')) {
+		elgg_register_plugin_hook_handler('register', 'menu:simpleicon-entity', 'rss_feed_setup_simpleicon_entity_menu');
+	}
 
 	// Notifications
 	register_notification_object('object', 'rss_feed', elgg_echo('rss:notification:subject'));
@@ -65,6 +72,9 @@ function rss_init() {
 	
 	// Profile block hook	
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'rss_owner_block_menu');
+
+	// Ajax whitelist
+	elgg_register_ajax_view('rss/embeddable');
 }
 
 /**
@@ -83,10 +93,7 @@ function rss_init() {
 function rss_page_handler($page) {
 	elgg_push_context('rss');
 	elgg_push_breadcrumb(elgg_echo('rss'), 'rss');
-	
-	elgg_load_css('elgg.rss');
-	elgg_load_js('elgg.rss');
-	
+
 	$page_type = $page[0];
 
 	switch ($page_type) {
@@ -155,6 +162,39 @@ function rss_owner_block_menu($hook, $type, $value, $params) {
 	}
 	return $value;
 }
+
+/**
+ * Add 'embed rss' item for photo simpleicon entity menu
+ *
+ * @param sting  $hook   view
+ * @param string $type   input/tags
+ * @param mixed  $return  Value
+ * @param mixed  $params Params
+ *
+ * @return array
+ */
+function rss_feed_setup_simpleicon_entity_menu($hook, $type, $return, $params) {
+	if (get_input('embed_spot_content')) {
+		$entity = $params['entity'];
+		
+		if (elgg_instanceof($entity, 'object', 'rss_feed')) {
+			// Item to add object to portfolio
+			$options = array(
+				'name' => 'embed_feed',
+				'text' => elgg_echo('rss:label:embedfeed'),
+				'title' => 'embed_feed',
+				'href' => "#{$entity->guid}",
+				'class' => 'elgg-rss-embed-feed elgg-button elgg-button-action',
+				'section' => 'info',
+			);
+			
+			$return[] = ElggMenuItem::factory($options);
+			return $return;
+		}
+	}
+	return $return;
+}
+
 
 /**
  * Set the notification message for rss feeds

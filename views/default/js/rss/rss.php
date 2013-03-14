@@ -21,21 +21,24 @@ elgg.rss.init = function() {
 
  	// Delegate submit handler for rss feed form
  	$(document).delegate('#rss-save-form', 'submit', elgg.rss.saveFormSubmit);
+
+ 	// Delegate click handler for rss embed
+ 	$(document).delegate('.elgg-rss-embed-feed', 'click', elgg.rss.feedEmbedClick);
 }
 
 elgg.rss.initFeed = function($feed) {
-		var feed_url = $feed.data('feed_url');
-
 		var feeds = {};
-		feeds.main = feed_url;
+		$feed.children('input._rss-feed-source').each(function() {
+			feeds[$(this).attr('name')] = $(this).val();
+		});
 
 		$feed.feeds({
 			'feeds': feeds, // Feeds object (can be multiple)
 			'entryTemplate': elgg.rss.getDefaultEntryTemplate(),
 			'loadingTemplate': '<div class="elgg-ajax-loader"></div>',
-			'preprocess': function(feed) {
-				//
-			}
+			// 'preprocess': function(feed) {
+				
+			// }
 		});
 }
 
@@ -73,6 +76,38 @@ elgg.rss.saveFormSubmit = function(event) {
 			}
 		});
 	}
+}
+
+// Click handler for rss feed embed click
+elgg.rss.feedEmbedClick = function(event) {
+	if (!$(this).hasClass('disabled')) {
+		// href will be #{guid}
+		var entity_guid = $(this).attr('href').substring(1);
+
+		$(this).addClass('disabled');
+
+		$_this = $(this);
+
+		console.log($_this);
+
+		// Get embed
+		elgg.get('ajax/view/rss/embeddable', {
+			dataType: 'html',
+			data: {
+				entity_guid: entity_guid,
+			}, 
+			success: function(data) {	
+				if (data.status != -1) {
+					console.log(data);
+					elgg.tgsembed.insert(data);
+				} else {
+					// Error
+					$_this.removeClass('disabled');
+				}
+			},
+		});
+	}
+	event.preventDefault();
 }
 
 elgg.register_hook_handler('init', 'system', elgg.rss.init);

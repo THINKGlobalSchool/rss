@@ -22,11 +22,14 @@
 }
 
 .elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-title {
-	
+	display: block;
+	font-size: 1.2em;
+	font-weight: bold;
+	margin-bottom: 3px;
 }
 
 .elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-date {
-	
+	margin-bottom: 3px;
 }
 
 .elgg-rss-feed .elgg-rss-feed-entry .elgg-rss-feed-entry-excerpt {

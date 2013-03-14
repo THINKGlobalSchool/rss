@@ -8,13 +8,22 @@
  * @copyright THINK Global School 2010
  * @link http://www.thinkglobalschool.com/
  *
- * @uses $vars['url']
+ * @uses $vars['sources']
  */
 
-$url = elgg_extract('url', $vars);
+$sources = elgg_extract('sources', $vars);
+
+foreach ($sources as $name => $url) {
+	$feed_sources .= elgg_view('input/hidden', array(
+		'name' => $name,
+		'value' => $url,
+		'class' => '_rss-feed-source'
+	));
+}
 
 $content = <<<HTML
-	<div class='elgg-rss-feed' data-feed_url={$url}>
+	<div class='elgg-rss-feed'>
+		$feed_sources
 	</div>
 HTML;
 
