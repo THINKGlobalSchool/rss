@@ -87,7 +87,10 @@ $content = <<<HTML
 		<div>
 			<label>$url_label</label>
 			$url_input
-			<div id='rss-feed-preview'>
+			<div id='elgg-rss-feed-preview-container'>
+				<div class='elgg-rss-feed-title hidden'><h3>Preview</h3></div>
+				<div id='elgg-rss-feed-preview'>
+				</div>
 			</div>
 		</div><br />
 		<div>

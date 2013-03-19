@@ -30,6 +30,7 @@ $english = array(
 	'rss:label:embedfeed' => 'Embed Feed',
 	'rss:byline' => 'Added by %s',
 	'rss:label:readarticle' => 'Read Full Article',
+	'rss:label:from' => 'From: %s',
 
 	// Notifications
 	'rss:notification:subject' => 'New RSS Feed',

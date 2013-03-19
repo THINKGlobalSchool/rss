@@ -51,9 +51,15 @@ elgg.rss.getFeedInitOptions = function(feeds, max) {
 	// Default max value is -1 (load upto 100 entries from api)
 	max = typeof max !== 'undefined' ? max : -1;
 
+	if (elgg.rss.countProperties(feeds) > 1) {
+		var template = elgg.rss.getMultiSourceEntryTemplate();
+	} else {
+		var template = elgg.rss.getDefaultEntryTemplate();
+	}
+
 	var feed_init = {
 		'feeds': feeds, // Feeds object (can be multiple)
-		'entryTemplate': elgg.rss.getDefaultEntryTemplate(),
+		'entryTemplate': template,
 		'loadingTemplate': '<div class="elgg-ajax-loader"></div>',
 		'xml': true,
 		'max': max,
@@ -63,6 +69,8 @@ elgg.rss.getFeedInitOptions = function(feeds, max) {
 			}
 		},
 		'preprocess': function(feed) {
+			this.fromLabel = elgg.echo('rss:label:from', [this.source]);
+
 			// Hack to fix broken feeds.. these seem to only be a handful
 			if (this.contentSnippet.indexOf("<!--") !== -1 || this.contentSnippet.indexOf("&lt;") !== -1) {
 				var div = document.createElement("div");
@@ -75,7 +83,6 @@ elgg.rss.getFeedInitOptions = function(feeds, max) {
 				}
 
 				// Strip out 'more'
-
 				div.innerHTML = descriptionText;
 				var text = div.textContent || div.innerText || "";
 
@@ -89,10 +96,25 @@ elgg.rss.getFeedInitOptions = function(feeds, max) {
 	return feed_init;
 }
 
-elgg.rss.getDefaultEntryTemplate = function(entry) {
+// Default entry template
+elgg.rss.getDefaultEntryTemplate = function() {
 	return '<div class="elgg-rss-feed-entry elgg-rss-feed-source-<!=source!>">' + 
 				'<a class="elgg-rss-feed-entry-title" target="_blank" href="<!=link!>" title="<!=title!>"><!=title!></a>' +
 				'<div class="elgg-rss-feed-entry-date elgg-subtext"><!=publishedDate!></div>' + 
+				'<div class="elgg-rss-feed-entry-content-excerpt"><!=contentSnippet!>' +
+				'&nbsp;<a target="_blank" href="<!=link!>" class="elgg-rss-feed-entry-read-article">' + elgg.echo('rss:label:readarticle') + '</a>' + 
+				'</div>' + 
+			'</div>';
+}
+
+// Multiple source entry template
+elgg.rss.getMultiSourceEntryTemplate = function() {
+	return '<div class="elgg-rss-feed-entry elgg-rss-feed-source-<!=source!>">' + 
+				'<a class="elgg-rss-feed-entry-title" target="_blank" href="<!=link!>" title="<!=title!>"><!=title!></a>' +
+				'<div class="elgg-rss-feed-multi-container">' +
+				'<div class="elgg-rss-feed-from"><!=fromLabel!></div>' + 
+				'<div class="elgg-rss-feed-entry-date elgg-subtext"><!=publishedDate!></div>' + 
+				'</div>' +
 				'<div class="elgg-rss-feed-entry-content-excerpt"><!=contentSnippet!>' +
 				'&nbsp;<a target="_blank" href="<!=link!>" class="elgg-rss-feed-entry-read-article">' + elgg.echo('rss:label:readarticle') + '</a>' + 
 				'</div>' + 
@@ -134,8 +156,9 @@ elgg.rss.feedPreview = function(event) {
 
 	var $_this = $(this);
 
-	var $feed_preview_container = $_this.siblings('#rss-feed-preview');
-	$feed_preview_container.html('').removeClass('elgg-rss-feed');
+	var $feed_preview_container = $_this.siblings('#elgg-rss-feed-preview-container');
+	$feed_preview_container.children('#elgg-rss-feed-preview').html('').removeClass('elgg-rss-feed');
+	$feed_preview_container.children('.elgg-rss-feed-title').hide();
 	$('input[name="feed_link"]').val('');
 
 	$feed_preview_container.addClass('elgg-ajax-loader');
@@ -149,7 +172,8 @@ elgg.rss.feedPreview = function(event) {
 				$_this.data('valid_feed', 1);
 				var feeds = {};
 				feeds['preview'] = feed_url;
-				$feed_preview_container.addClass('elgg-rss-feed').feeds(elgg.rss.getFeedInitOptions(feeds, 4));
+				$feed_preview_container.children('#elgg-rss-feed-preview').addClass('elgg-rss-feed').feeds(elgg.rss.getFeedInitOptions(feeds, 4));
+				$feed_preview_container.children('.elgg-rss-feed-title').show();
 				$('input[name="feed_link"]').val(result.output.feed_link);
 			} else {
 				// Invalid
@@ -170,8 +194,6 @@ elgg.rss.feedEmbedClick = function(event) {
 
 		$_this = $(this);
 
-		console.log($_this);
-
 		// Get embed
 		elgg.get('ajax/view/rss/embeddable', {
 			dataType: 'html',
@@ -180,7 +202,6 @@ elgg.rss.feedEmbedClick = function(event) {
 			}, 
 			success: function(data) {	
 				if (data.status != -1) {
-					console.log(data);
 					elgg.tgsembed.insert(data);
 				} else {
 					// Error
@@ -190,6 +211,18 @@ elgg.rss.feedEmbedClick = function(event) {
 		});
 	}
 	event.preventDefault();
+}
+
+// Helper function to count object properties
+elgg.rss.countProperties = function(obj) {
+    var count = 0;
+
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
+            ++count;
+    }
+
+    return count;
 }
 
 elgg.register_hook_handler('init', 'system', elgg.rss.init);

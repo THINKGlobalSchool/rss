@@ -10,11 +10,23 @@
  *
  * @uses $vars['sources']
  * @uses $vars['max']     Optional: Max number of entries to display
+ * @uses $vars['title']   Optional: Title to display
  */
 
 $max = elgg_extract('max', $vars, -1);
 
 $sources = elgg_extract('sources', $vars);
+
+$title = elgg_extract('title', $vars, NULL);
+
+
+if ($title) {
+	$img = elgg_view('output/img', array(
+		'src' => 'mod/rss/graphics/feed-icon-14x14.png',
+	));
+
+	$title_content = "<div class='elgg-rss-feed-title'>$img $title</div>";
+}
 
 foreach ($sources as $name => $url) {
 	$feed_sources .= elgg_view('input/hidden', array(
@@ -30,6 +42,7 @@ $max_input = elgg_view('input/hidden', array(
 ));
 
 $content = <<<HTML
+	$title_content
 	<div class='elgg-rss-feed'>
 		$feed_sources
 		$max_input
