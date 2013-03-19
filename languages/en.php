@@ -25,9 +25,11 @@ $english = array(
 	// Labels 
 	'rss:add' => 'Add RSS Feed',
 	'rss:label:noresults' => 'No Results',
-	'rss:label:groupfeeds' => 'Group RSS Feeds',
+	'rss:label:groupfeeds' => 'Group rss feeds',
 	'rss:label:url' => 'Feed URL',
 	'rss:label:embedfeed' => 'Embed Feed',
+	'rss:byline' => 'Added by %s',
+	'rss:label:readarticle' => 'Read Full Article',
 
 	// Notifications
 	'rss:notification:subject' => 'New RSS Feed',

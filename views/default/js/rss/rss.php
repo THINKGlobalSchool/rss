@@ -23,53 +23,91 @@ elgg.rss.init = function() {
 
  	// Delegate click handler for rss embed
  	$(document).delegate('.elgg-rss-embed-feed', 'click', elgg.rss.feedEmbedClick);
+
+ 	$(document).delegate('#rss-url', 'input propertychange', elgg.rss.feedPreview);
 }
 
 // Init all feeds
 elgg.rss.initFeeds = function() {
 	$('.elgg-rss-feed').each(function() {
- 		elgg.rss.initFeed($(this));
+ 		elgg.rss.initFeedFromInput($(this));
  	});
 }
 
-elgg.rss.initFeed = function($feed) {
+// Init feeds on container from feed source inputs
+elgg.rss.initFeedFromInput = function($feed) {
 		var feeds = {};
 		$feed.children('input._rss-feed-source').each(function() {
 			feeds[$(this).attr('name')] = $(this).val();
 		});
 
-		$feed.feeds({
-			'feeds': feeds, // Feeds object (can be multiple)
-			'entryTemplate': elgg.rss.getDefaultEntryTemplate(),
-			'loadingTemplate': '<div class="elgg-ajax-loader"></div>',
-			'onComplete': function(entries) {
-				if (!entries.length) {
-					$(this).append("<h3 class='center'>" + elgg.echo('rss:label:noresults') + "</h3>");
-				}
+		$feed.feeds(elgg.rss.getFeedInitOptions(feeds));
+}
+
+// Get common feed init options
+elgg.rss.getFeedInitOptions = function(feeds, max) {
+	// Default max value is -1 (load upto 100 entries from api)
+	max = typeof max !== 'undefined' ? max : -1;
+
+	var feed_init = {
+		'feeds': feeds, // Feeds object (can be multiple)
+		'entryTemplate': elgg.rss.getDefaultEntryTemplate(),
+		'loadingTemplate': '<div class="elgg-ajax-loader"></div>',
+		'xml': true,
+		'max': max,
+		'onComplete': function(entries) {
+			if (!entries.length) {
+				$(this).append("<h3 class='center'>" + elgg.echo('rss:label:noresults') + "</h3>");
 			}
-			// 'preprocess': function(feed) {}
-		});
+		},
+		'preprocess': function(feed) {
+			// Hack to fix broken feeds.. these seem to only be a handful
+			if (this.contentSnippet.indexOf("<!--") !== -1 || this.contentSnippet.indexOf("&lt;") !== -1) {
+				var div = document.createElement("div");
+
+				// Find description in XML
+				var descriptionText = this.xml.find('description').text();
+
+				if (descriptionText.indexOf("More&#160;&#187;") !== -1) {
+					descriptionText = descriptionText.replace("More&#160;&#187;", "");
+				}
+
+				// Strip out 'more'
+
+				div.innerHTML = descriptionText;
+				var text = div.textContent || div.innerText || "";
+
+				text = text.substring(0, 120) + ' ...';
+
+				this.contentSnippet = text;
+			}
+		}
+	}
+
+	return feed_init;
 }
 
 elgg.rss.getDefaultEntryTemplate = function(entry) {
 	return '<div class="elgg-rss-feed-entry elgg-rss-feed-source-<!=source!>">' + 
 				'<a class="elgg-rss-feed-entry-title" target="_blank" href="<!=link!>" title="<!=title!>"><!=title!></a>' +
 				'<div class="elgg-rss-feed-entry-date elgg-subtext"><!=publishedDate!></div>' + 
-				'<div class="elgg-rss-feed-entry-content-excerpt"><!=contentSnippet!></div>' + 
+				'<div class="elgg-rss-feed-entry-content-excerpt"><!=contentSnippet!>' +
+				'&nbsp;<a target="_blank" href="<!=link!>" class="elgg-rss-feed-entry-read-article">' + elgg.echo('rss:label:readarticle') + '</a>' + 
+				'</div>' + 
 			'</div>';
 }
 
 // RSS Feed save form submit handler
 elgg.rss.saveFormSubmit = function(event) {
-	$(this).find('input[name=rss_save_input]').attr('disabled', 'DISABLED');
+	var $save_input = $(this).find('input[name=rss_save_input]');
+	$save_input.attr('disabled', 'DISABLED');
 
-	if (!$(this).data('valid_feed')) {
-		// Stop submit
+	if (!$('#rss-url').data('valid_feed')) {		
 		event.preventDefault();
 
-		var $_this = $(this);
+		var feed_url = $(this).find('#rss-url').val();
 
-		var feed_url = $(this).find('input[name=feed_url]').val();
+		var $_this = $(this);
 
 		elgg.action('rss/validate', {
 			data: {
@@ -77,14 +115,44 @@ elgg.rss.saveFormSubmit = function(event) {
 			}, 
 			success: function(result) {
 				if (result.status == 0) {
-					$_this.data('valid_feed', 1);
+					$('#rss-url').data('valid_feed', 1);
 					$_this.trigger('submit');
 				} else {
-					$_this.find('input[name=rss_save_input]').removeAttr('disabled');
+					$save_input.removeAttr('disabled');
 				}
 			}
 		});
 	}
+}
+
+// Change handler for rss feed url input
+elgg.rss.feedPreview = function(event) {
+	var feed_url = $(this).val();
+
+	var $_this = $(this);
+
+	var $feed_preview_container = $_this.siblings('#rss-feed-preview');
+	$feed_preview_container.html('');
+
+	$feed_preview_container.addClass('elgg-ajax-loader');
+
+	elgg.action('rss/validate', {
+		data: {
+			feed_url: feed_url
+		}, 
+		success: function(result) {
+			if (result.status == 0) {
+				$_this.data('valid_feed', 1);
+				var feeds = {};
+				feeds['preview'] = feed_url;
+				$feed_preview_container.addClass('elgg-rss-feed').feeds(elgg.rss.getFeedInitOptions(feeds, 4));
+			} else {
+				// Invalid
+				$_this.data('valid_feed', 0);
+			}
+			$feed_preview_container.removeClass('elgg-ajax-loader');
+		}
+	});
 }
 
 // Click handler for rss feed embed click

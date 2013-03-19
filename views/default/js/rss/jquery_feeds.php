@@ -12,6 +12,6 @@
 
 $js_path = elgg_get_config('path');
 
-$rss_path = "{$js_path}mod/rss/vendors/jquery.feeds.min.js";
+$rss_path = "{$js_path}mod/rss/vendors/jquery.feeds.js";
 
 include $rss_path;

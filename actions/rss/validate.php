@@ -21,6 +21,7 @@ $feed->init();
 $feed->handle_content_type();
 
 if ($error = $feed->error()) {
+	//register_error($error);
     register_error(elgg_echo('rss:error:invalidurl'));
 }
 

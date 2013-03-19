@@ -81,6 +81,8 @@ $content = <<<HTML
 		<div>
 			<label>$url_label</label>
 			$url_input
+			<div id='rss-feed-preview'>
+			</div>
 		</div><br />
 		<div>
 			<label>$description_label</label>

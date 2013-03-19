@@ -20,12 +20,13 @@ if (!$rss) {
 $owner = $rss->getOwnerEntity();
 $container = $rss->getContainerEntity();
 
-$owner_icon = elgg_view_entity_icon($owner, 'tiny');
+//$owner_icon = elgg_view_entity_icon($owner, 'tiny');
 $owner_link = elgg_view('output/url', array(
 	'href' => "rss/owner/$owner->username",
 	'text' => $owner->name,
 ));
-$author_text = elgg_echo('byline', array($owner_link));
+
+$author_text = elgg_echo('rss:byline', array($owner_link));
 $tags = elgg_view('output/tags', array('tags' => $rss->tags));
 $date = elgg_view_friendly_time($rss->time_created);
 
@@ -56,6 +57,14 @@ if (elgg_in_context('widgets')) {
 	$metadata = '';
 }
 
+
+$rss_icon = elgg_view('output/url', array(
+	'href' => $rss->getURL(),
+	'text' => elgg_view('output/img', array(
+		'src' => 'mod/rss/graphics/feed-icon-28x28.png',
+	))
+));
+
 if ($full) {
 	$body = elgg_view('output/longtext', array(
 		'value' => $rss->description,
@@ -78,7 +87,7 @@ if ($full) {
 
 	$list_body = elgg_view('object/elements/summary', $params);
 
-	$rss_info = elgg_view_image_block($owner_icon, $list_body);
+	$rss_info = elgg_view_image_block($rss_icon, $list_body);
 
 	echo <<<HTML
 	$rss_info
@@ -100,5 +109,5 @@ HTML;
 	$params = $params + $vars;
 	$list_body = elgg_view('object/elements/summary', $params);
 
-	echo elgg_view_image_block($owner_icon, $list_body);
+	echo elgg_view_image_block($rss_icon, $list_body);
 }
