@@ -41,7 +41,9 @@ elgg.rss.initFeedFromInput = function($feed) {
 			feeds[$(this).attr('name')] = $(this).val();
 		});
 
-		$feed.feeds(elgg.rss.getFeedInitOptions(feeds));
+		var max = $feed.children('input[name="max"]').val();
+
+		$feed.feeds(elgg.rss.getFeedInitOptions(feeds, max));
 }
 
 // Get common feed init options
@@ -116,6 +118,7 @@ elgg.rss.saveFormSubmit = function(event) {
 			success: function(result) {
 				if (result.status == 0) {
 					$('#rss-url').data('valid_feed', 1);
+					$('input[name="feed_link"]').val(result.output.feed_link);
 					$_this.trigger('submit');
 				} else {
 					$save_input.removeAttr('disabled');
@@ -132,7 +135,8 @@ elgg.rss.feedPreview = function(event) {
 	var $_this = $(this);
 
 	var $feed_preview_container = $_this.siblings('#rss-feed-preview');
-	$feed_preview_container.html('');
+	$feed_preview_container.html('').removeClass('elgg-rss-feed');
+	$('input[name="feed_link"]').val('');
 
 	$feed_preview_container.addClass('elgg-ajax-loader');
 
@@ -146,6 +150,7 @@ elgg.rss.feedPreview = function(event) {
 				var feeds = {};
 				feeds['preview'] = feed_url;
 				$feed_preview_container.addClass('elgg-rss-feed').feeds(elgg.rss.getFeedInitOptions(feeds, 4));
+				$('input[name="feed_link"]').val(result.output.feed_link);
 			} else {
 				// Invalid
 				$_this.data('valid_feed', 0);

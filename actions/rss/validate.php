@@ -25,4 +25,8 @@ if ($error = $feed->error()) {
     register_error(elgg_echo('rss:error:invalidurl'));
 }
 
+echo json_encode(array(
+	'feed_link' => $feed->get_link(),
+));
+
 forward(REFERER);

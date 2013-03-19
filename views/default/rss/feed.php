@@ -9,7 +9,10 @@
  * @link http://www.thinkglobalschool.com/
  *
  * @uses $vars['sources']
+ * @uses $vars['max']     Optional: Max number of entries to display
  */
+
+$max = elgg_extract('max', $vars, -1);
 
 $sources = elgg_extract('sources', $vars);
 
@@ -21,9 +24,15 @@ foreach ($sources as $name => $url) {
 	));
 }
 
+$max_input = elgg_view('input/hidden', array(
+	'name' => 'max',
+	'value' => $max,
+));
+
 $content = <<<HTML
 	<div class='elgg-rss-feed'>
 		$feed_sources
+		$max_input
 	</div>
 HTML;
 

@@ -17,6 +17,7 @@ elgg_load_js('elgg.rss');
 $title          = elgg_extract('title', $vars);
 $description	= elgg_extract('description', $vars);
 $feed_url       = elgg_extract('feed_url', $vars);
+$feed_link      = elgg_extract('feed_link', $vars);
 $tags 			= elgg_extract('tags', $vars);
 $access_id 		= elgg_extract('access_id', $vars, ACCESS_DEFAULT);
 $container_guid = elgg_extract('container_guid', $vars);
@@ -69,7 +70,12 @@ $save_input = elgg_view('input/submit', array(
 
 $container_guid_input = elgg_view('input/hidden', array(
 	'name' => 'container_guid',
-	'value' => $container_guid,
+	'value' => $container_guid
+));
+
+$feed_link_input = elgg_view('input/hidden', array(
+	'name' => 'feed_link',
+	'value' => $feed_link
 ));
 
 $content = <<<HTML
@@ -99,6 +105,7 @@ $content = <<<HTML
 		<div class="elgg-foot">
 			$save_input
 		</div>
+		$feed_link_input
 		$entity_guid_input
 		$container_guid_input
 	</div>

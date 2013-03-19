@@ -181,6 +181,7 @@ function rss_prepare_form_vars($rss = NULL) {
 		'tags' => NULL,
 		'access_id' => ACCESS_DEFAULT,
 		'feed_url' => NULL,
+		'feed_link' => NULL,
 		'container_guid' => elgg_get_page_owner_guid(),
 		'guid' => NULL,
 		'title' => NULL,

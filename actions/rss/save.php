@@ -14,7 +14,8 @@
 $guid 				= get_input('guid');
 $title              = get_input('title');
 $description		= get_input('description');
-$feed_url           = get_input('feed_url');          
+$feed_url           = get_input('feed_url');
+$feed_link          = get_input('feed_link'); // Site link          
 $tags 				= string_to_tag_array(get_input('tags'));
 $access 			= get_input('access_id');
 $container_guid 	= get_input('container_guid', NULL);
@@ -44,6 +45,7 @@ if ($guid) {
 $rss->title = $title;
 $rss->description = $description;
 $rss->feed_url = $feed_url;
+$rss->feed_link = $feed_link;
 $rss->tags = $tags;
 $rss->access_id = $access;
 
