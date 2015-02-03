@@ -5,7 +5,7 @@
  * @package RSS
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.com/
  *
  */
@@ -25,19 +25,16 @@ function rss_init() {
 
 	// Register CSS
 	$r_css = elgg_get_simplecache_url('css', 'rss/css');
-	elgg_register_simplecache_view('css/rss/css');
 	elgg_register_css('elgg.rss', $r_css);
 	elgg_load_css('elgg.rss');
 		
 	// Register JS library
 	$r_js = elgg_get_simplecache_url('js', 'rss/rss');
-	elgg_register_simplecache_view('js/rss/rss');
 	elgg_register_js('elgg.rss', $r_js);
 	elgg_load_js('elgg.rss');
 
 	// Register jquery feeds JS library
 	$r_js = elgg_get_simplecache_url('js', 'rss/jquery_feeds');
-	elgg_register_simplecache_view('js/rss/jquery_feeds');
 	elgg_register_js('jquery.feeds', $r_js);
 
 	elgg_load_js('jquery.feeds');
@@ -52,8 +49,9 @@ function rss_init() {
 	}
 
 	// Notifications
-	register_notification_object('object', 'rss_feed', elgg_echo('rss:notification:subject'));
-	elgg_register_plugin_hook_handler('notify:entity:message', 'object', 'rss_notify_message');
+	elgg_register_notification_event('object', 'rss_feed', array('create'));
+	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:rss_feed', 'rss_prepare_notification');
+
 	
 	// Register actions
 	$action_base = elgg_get_plugins_path() . 'rss/actions/rss';
@@ -62,7 +60,7 @@ function rss_init() {
 	elgg_register_action('rss/validate', "$action_base/validate.php");
 
 	// Entity url and icon handlers
-	elgg_register_entity_url_handler('object', 'rss_feed', 'rss_url_handler');
+	elgg_register_plugin_hook_handler('entity:url', 'object', 'rss_url_handler');
 
 	// Register type
 	elgg_register_entity_type('object', 'rss_feed');
@@ -130,14 +128,25 @@ function rss_page_handler($page) {
 }
 
 /**
- * Populates the getUrl() method for a rss feeds
+ * Returns the URL from an rss entity
  *
- * @param ElggEntity entity
- * @return string request url
+ * @param string $hook   'entity:url'
+ * @param string $type   'object'
+ * @param string $url    The current URL
+ * @param array  $params Hook parameters
+ * @return string
  */
-function rss_url_handler($entity) {
-	return elgg_get_site_url() . "rss/view/{$entity->guid}/";
+function rss_url_handler($hook, $type, $url, $params) {
+	$entity = $params['entity'];
+
+	// Check that the entity is an rss object
+	if (!elgg_instanceof($entity, 'object', 'rss_feed')) {
+		return;
+	}
+
+	return "rss/view/{$entity->guid}/";
 }
+
 
 /**
  * Plugin hook to add rss feeds to the profile block
@@ -195,30 +204,35 @@ function rss_feed_setup_simpleicon_entity_menu($hook, $type, $return, $params) {
 	return $return;
 }
 
-
 /**
- * Set the notification message for rss feeds
- * 
- * @param string $hook    Hook name
- * @param string $type    Hook type
- * @param string $message The current message body
- * @param array  $params  Parameters about the blog posted
- * @return string
+ * Prepare a notification message about a new rss feed
+ *
+ * @param string                          $hook         Hook name
+ * @param string                          $type         Hook type
+ * @param Elgg_Notifications_Notification $notification The notification to prepare
+ * @param array                           $params       Hook parameters
+ * @return Elgg_Notifications_Notification
  */
-function rss_notify_message($hook, $type, $message, $params) {
-	$entity = $params['entity'];
-	$to_entity = $params['to_entity'];
+function rss_prepare_notification($hook, $type, $notification, $params) {
+	$entity = $params['event']->getObject();
+	$owner = $params['event']->getActor();
+	$recipient = $params['recipient'];
+	$language = $params['language'];
 	$method = $params['method'];
-	if (elgg_instanceof($entity, 'object', 'rss_feed')) {
-		$descr = $entity->description;
-		$title = $entity->title;
-		$owner = $entity->getOwnerEntity();
-		return elgg_echo('rss:notification:body', array(
+
+	// Title for the notification
+	$notification->subject = elgg_echo('rss:notification:subject');
+
+    // Message body for the notification
+	$notification->body = elgg_echo('rss:notification:body', array(
 			$owner->name,
-			$title,
-			$descr,
+			$entity->title,
+			$entity->description,
 			$entity->getURL()
-		));
-	}
-	return null;
+	), $language);
+
+    // The summary text is used e.g. by the site_notifications plugin
+    $notification->summary = elgg_echo('rss:notification:summary', array($entity->title), $language);
+
+    return $notification;
 }

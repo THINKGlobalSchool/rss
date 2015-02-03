@@ -5,12 +5,12 @@
  * @package RSS
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
+ * @copyright THINK Global School 2010 - 2015
  * @link http://www.thinkglobalschool.com/
  *
  */
 
-$english = array(
+return array(
 	// Generic
 	'item:object:rss_feed' => 'RSS Feeds',
 	'rss' => 'RSS Feeds',
@@ -34,6 +34,7 @@ $english = array(
 
 	// Notifications
 	'rss:notification:subject' => 'New RSS Feed',
+	'rss:notification:summary' => 'New RSS Feed: %s',
 	'rss:notification:body' => "%s created a new RSS Feed titled: %s\n\n%s\n\nTo view the feed click here:\n%s
 ",
 
@@ -50,5 +51,3 @@ $english = array(
 	'rss:error:invalidurl' => 'Invalid Feed URL',
 	'rss:error:notfound' => 'RSS Feed Not Found',
 );
-
-add_translation('en',$english);
