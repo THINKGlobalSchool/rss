@@ -5,8 +5,8 @@
  * @package RSS
  * @license http://www.gnu.org/licenses/old-licenses/gpl-2.0.html GNU Public License version 2
  * @author Jeff Tilson
- * @copyright THINK Global School 2010
- * @link http://www.thinkglobalschool.com/
+ * @copyright THINK Global School 2010 - 2015
+ * @link http://www.thinkglobalschool.org/
  *
  */
 
@@ -60,7 +60,12 @@ elgg_clear_sticky_form('rss-save-form');
 
 if (!$guid) {
 	// Add to river
-	add_to_river('river/object/rss_feed/create', 'create', elgg_get_logged_in_user_guid(), $rss->getGUID());
+	elgg_create_river_item(array(
+		'view' => 'river/object/rss_feed/create',
+		'action_type' => 'create',
+		'subject_guid' => elgg_get_logged_in_user_guid(),
+		'object_guid' => $rss->getGUID()
+	));
 }
 
 // Forward on
