@@ -50,7 +50,7 @@ function rss_init() {
 
 	// Notifications
 	elgg_register_notification_event('object', 'rss_feed', array('create'));
-	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:rss_feed', 'rss_prepare_notification');
+	elgg_register_plugin_hook_handler('prepare', 'notification:create:object:rss_feed', 'rss_prepare_notification');
 
 	
 	// Register actions
